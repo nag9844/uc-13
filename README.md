@@ -1,146 +1,73 @@
-# Hello World API with AWS Cognito Authentication
+## Requirements
 
-This Terraform configuration creates a simple Hello World API using AWS API Gateway, Lambda, and Cognito for authentication.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~> 2.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
 
-## Architecture
+## Providers
 
-- **AWS Cognito**: User authentication and authorization
-- **AWS API Gateway**: REST API endpoint with Cognito authorization
-- **AWS Lambda**: Backend function that returns "Hello World"
-- **CloudWatch**: Logging for Lambda function
+| Name | Version |
+|------|---------|
+| <a name="provider_archive"></a> [archive](#provider\_archive) | 2.7.1 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.100.0 |
 
-## Prerequisites
+## Modules
 
-1. AWS CLI configured with appropriate credentials
-2. Terraform installed (>= 1.0)
-3. Appropriate AWS permissions to create the resources
+No modules.
 
-## Required AWS Permissions
+## Resources
 
-Your AWS credentials need the following permissions:
-- IAM (roles, policies)
-- Lambda (functions, permissions)
-- API Gateway (REST APIs, methods, deployments)
-- Cognito (user pools, clients)
-- CloudWatch (log groups)
+| Name | Type |
+|------|------|
+| [aws_api_gateway_authorizer.cognito](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_authorizer) | resource |
+| [aws_api_gateway_deployment.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_deployment) | resource |
+| [aws_api_gateway_integration.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_integration) | resource |
+| [aws_api_gateway_integration.options_hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_integration) | resource |
+| [aws_api_gateway_integration_response.options_hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_integration_response) | resource |
+| [aws_api_gateway_method.get_hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method) | resource |
+| [aws_api_gateway_method.options_hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method) | resource |
+| [aws_api_gateway_method_response.get_hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_response) | resource |
+| [aws_api_gateway_method_response.options_hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_response) | resource |
+| [aws_api_gateway_resource.hello](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_resource) | resource |
+| [aws_api_gateway_rest_api.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_rest_api) | resource |
+| [aws_api_gateway_stage.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_stage) | resource |
+| [aws_cloudwatch_log_group.lambda_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
+| [aws_cognito_user.test_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cognito_user) | resource |
+| [aws_cognito_user_pool.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cognito_user_pool) | resource |
+| [aws_cognito_user_pool_client.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cognito_user_pool_client) | resource |
+| [aws_iam_role.lambda_execution_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy.lambda_additional_permissions](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy_attachment.lambda_basic_execution](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_lambda_function.hello_world](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
+| [aws_lambda_permission.api_gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_permission) | resource |
+| [archive_file.lambda_zip](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
-## Deployment
+## Inputs
 
-1. **Initialize Terraform:**
-   ```bash
-   cd terraform
-   terraform init
-   ```
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_api_gateway_name"></a> [api\_gateway\_name](#input\_api\_gateway\_name) | Name for the API Gateway | `string` | `"hello-world-api"` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region | `string` | `"ap-south-1"` | no |
+| <a name="input_cognito_user_pool_name"></a> [cognito\_user\_pool\_name](#input\_cognito\_user\_pool\_name) | Name for the Cognito User Pool | `string` | `"hello-world-user-pool"` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | `"dev"` | no |
+| <a name="input_lambda_function_name"></a> [lambda\_function\_name](#input\_lambda\_function\_name) | Name for the Lambda function | `string` | `"hello-world-function"` | no |
+| <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Name of the project | `string` | `"hello-world-app"` | no |
 
-2. **Plan the deployment:**
-   ```bash
-   terraform plan
-   ```
+## Outputs
 
-3. **Apply the configuration:**
-   ```bash
-   terraform apply
-   ```
-
-4. **Note the outputs:** After successful deployment, note the following outputs:
-   - `api_gateway_url`: The URL to test your API
-   - `cognito_user_pool_id`: User Pool ID
-   - `cognito_user_pool_client_id`: Client ID for authentication
-   - `test_user_info`: Test user credentials
-
-## Testing the API
-
-### Method 1: Using AWS CLI (Recommended)
-
-1. **Authenticate and get tokens:**
-   ```bash
-   aws cognito-idp admin-initiate-auth \
-     --user-pool-id <USER_POOL_ID> \
-     --client-id <CLIENT_ID> \
-     --auth-flow ADMIN_NO_SRP_AUTH \
-     --auth-parameters USERNAME=testuser,PASSWORD=TempPassword123! \
-     --region <AWS_REGION>
-   ```
-
-2. **Use the ID token to call the API:**
-   ```bash
-   curl -H "Authorization: <ID_TOKEN>" <API_GATEWAY_URL>
-   ```
-
-### Method 2: Using Postman or Similar Tool
-
-1. First, get an access token by making a POST request to Cognito
-2. Use the token in the Authorization header when calling the API Gateway URL
-
-### Method 3: Without Authentication (Should Fail)
-
-```bash
-curl <API_GATEWAY_URL>
-```
-
-This should return a 401 Unauthorized error.
-
-## Test User
-
-A test user is automatically created with:
-- **Username**: `testuser`
-- **Email**: `test@example.com`
-- **Temporary Password**: `TempPassword123!`
-
-**Note**: You'll need to change the password on first login.
-
-## File Structure
-
-```
-terraform/
-├── main.tf              # Main Terraform configuration
-├── variables.tf         # Input variables
-├── outputs.tf           # Output values
-├── cognito.tf          # Cognito resources
-├── lambda.tf           # Lambda function and related resources
-├── api-gateway.tf      # API Gateway configuration
-├── iam.tf              # IAM roles and policies
-├── lambda/
-│   └── hello_world.py  # Lambda function code
-└── README.md           # This file
-```
-
-## Customization
-
-You can customize the deployment by modifying the variables in `variables.tf` or by passing them during terraform apply:
-
-```bash
-terraform apply -var="aws_region=us-west-2" -var="project_name=my-hello-world"
-```
-
-## Clean Up
-
-To destroy all resources:
-
-```bash
-terraform destroy
-```
-
-## Security Considerations
-
-- The test user is created for development purposes only
-- In production, remove the test user creation
-- Consider implementing more sophisticated password policies
-- Enable MFA for production environments
-- Review and adjust IAM permissions as needed
-
-## Troubleshooting
-
-1. **403 Forbidden**: Check that you're using the correct ID token in the Authorization header
-2. **500 Internal Server Error**: Check CloudWatch logs for the Lambda function
-3. **Resource conflicts**: Ensure resource names are unique in your AWS account
-
-## Cost Considerations
-
-This setup uses AWS services that may incur costs:
-- Lambda: Pay per request and compute time
-- API Gateway: Pay per API call
-- Cognito: Free tier available, then pay per MAU
-- CloudWatch: Pay for log storage and queries
-
-Most usage for development/testing will fall within AWS free tier limits.
+| Name | Description |
+|------|-------------|
+| <a name="output_api_gateway_base_url"></a> [api\_gateway\_base\_url](#output\_api\_gateway\_base\_url) | API Gateway base URL |
+| <a name="output_api_gateway_url"></a> [api\_gateway\_url](#output\_api\_gateway\_url) | API Gateway URL for the Hello World endpoint |
+| <a name="output_aws_region"></a> [aws\_region](#output\_aws\_region) | AWS region |
+| <a name="output_cognito_user_pool_arn"></a> [cognito\_user\_pool\_arn](#output\_cognito\_user\_pool\_arn) | Cognito User Pool ARN |
+| <a name="output_cognito_user_pool_client_id"></a> [cognito\_user\_pool\_client\_id](#output\_cognito\_user\_pool\_client\_id) | Cognito User Pool Client ID |
+| <a name="output_cognito_user_pool_client_secret"></a> [cognito\_user\_pool\_client\_secret](#output\_cognito\_user\_pool\_client\_secret) | Cognito User Pool Client Secret |
+| <a name="output_cognito_user_pool_id"></a> [cognito\_user\_pool\_id](#output\_cognito\_user\_pool\_id) | Cognito User Pool ID |
+| <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | Lambda function ARN |
+| <a name="output_lambda_function_name"></a> [lambda\_function\_name](#output\_lambda\_function\_name) | Lambda function name |
+| <a name="output_test_user_info"></a> [test\_user\_info](#output\_test\_user\_info) | Test user information |
